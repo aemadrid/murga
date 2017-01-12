@@ -2,7 +2,9 @@ language: ruby
 rvm:
   - jruby-9.1.5.0
 cache: bundler
-before_install: gem install bundler -v 1.13.6
+before_install:
+  - gem install bundler -v 1.13.6
+  - gem install jbundler -v 0.9.3
 bundler_args: "--binstubs --without documentation --path ../bundle --retry=3 --jobs=3"
 before_script: bundle exec jbundle install
 script: bundle exec rspec spec --require spec_helper
