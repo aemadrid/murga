@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+ENV['RACK_ENV'] ||= 'development'
+
+require 'jbundler'
+Bundler.setup(:default, ENV['RACK_ENV'])
+
+require 'murga'
+
+require 'pry'
+Pry.start
