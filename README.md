@@ -19,10 +19,8 @@ Install the gem:
 Create a `server.rb` file:
 
 ```ruby
-# Setup the server
-server = Murga::Server.new host: ENV['HOST'], port: ENV['PORT'], log_requests: true
-# start the server and run until INT/TERM signal
-server.start_and_keep_running
+# Setup and run the server
+Murga::Server.run host: ENV['HOST'], port: ENV['PORT'], log_requests: true
 ```
 
 And run your new server:

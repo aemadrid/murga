@@ -6,6 +6,7 @@ module Murga
 
     def self.run(options = {})
       new(options).start
+      sleep 1 while true
     end
 
     attr_reader :config
@@ -34,11 +35,6 @@ module Murga
     end
 
     alias :run :start
-
-    def start_and_keep_running
-      start
-      sleep 1 while true
-    end
 
     def stop
       return false unless running?
