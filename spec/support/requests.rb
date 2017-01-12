@@ -7,9 +7,9 @@ module RequestsHelper
     body    = resp.body.to_s
     headers = resp.headers.to_hash
 
-    puts "[#{type}:#{path}] resp : status  : #{status}"
-    puts "[#{type}:#{path}] resp : body    : #{body}"
-    puts "[#{type}:#{path}] resp : headers : #{headers}"
+    # puts "[#{type}:#{path}] resp : status  : #{status}"
+    # puts "[#{type}:#{path}] resp : body    : #{body}"
+    # puts "[#{type}:#{path}] resp : headers : #{headers}"
 
     if exp_status
       expect(status).to eq(exp_status),
@@ -44,9 +44,9 @@ module RequestsHelper
 
     hsh = JrJackson::Json.load body
 
-    puts "[#{type}:#{path}] resp : status  : #{status}"
-    puts "[#{type}:#{path}] resp : body    : #{body}"
-    puts "[#{type}:#{path}] resp : headers : #{headers}"
+    # puts "[#{type}:#{path}] resp : status  : #{status}"
+    # puts "[#{type}:#{path}] resp : body    : #{body}"
+    # puts "[#{type}:#{path}] resp : headers : #{headers}"
 
     exp_status = options[:status] || 200
     expect(status).to eq(exp_status),
@@ -75,7 +75,7 @@ module RequestsHelper
   def request(path, options = {})
     type = options.delete(:method) || :get
 
-    puts "[#{type}:#{path}] requesting ..."
+    # puts "[#{type}:#{path}] requesting ..."
     url = server_url path
 
     headers = options.delete(:headers) || {}
