@@ -8,8 +8,6 @@ module Murga
 
     def initialize(options = {})
       @options = options.with_indifferent_access
-
-      raise 'Missing base_dir' unless base_dir.present?
     end
 
     def host

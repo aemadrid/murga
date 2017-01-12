@@ -42,7 +42,7 @@ module Murga
       let(:options) { { base_dir: path } }
       context 'when missing' do
         let(:options) { {} }
-        it { expect { subject }.to raise_error('Missing base_dir') }
+        it { expect { subject }.to_not raise_error }
       end
       context 'with a pathname' do
         let(:path) { EXAMPLE2_ROOT }
