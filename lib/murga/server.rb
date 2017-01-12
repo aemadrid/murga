@@ -11,7 +11,7 @@ module Murga
     attr_reader :config
 
     def initialize(options = {})
-      @config   = Config.new options
+      @config = Config.new options
     end
 
     def server
@@ -34,6 +34,11 @@ module Murga
     end
 
     alias :run :start
+
+    def start_and_keep_running
+      start
+      sleep 1 while true
+    end
 
     def stop
       return false unless running?
@@ -87,7 +92,10 @@ module Murga
     def ensure_peaceful_exit
       return unless @defined_at_exit.nil?
 
-      at_exit { stop if running? }
+      Signal.trap('INT') { stop }
+      Signal.trap('TERM') { stop }
+      at_exit { stop }
+
       @defined_at_exit = true
     end
 
