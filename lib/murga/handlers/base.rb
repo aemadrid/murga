@@ -28,20 +28,24 @@ module Murga
         @context = context unless context.nil?
         if handles_request?
           result = process_request
-          process_result(result) unless finalized?
+          process_result result
         else
           context.next
         end
       end
 
       def process_result(result)
+        return if finalized?
+
         case result
         when String
           render result
+          :string
         when Hash
           send_json result
+          :hash
         else
-          render result.to_s
+          :skipped
         end
       end
 
