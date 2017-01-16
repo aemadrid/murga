@@ -5,7 +5,11 @@ module Murga
     java_import 'ratpack.handling.RequestLogger'
 
     def self.run(options = {})
-      new(options).start
+      server = new(options).start
+
+      Signal.trap('INT') { server.stop; exit }
+      Signal.trap('TERM') { server.stop; exit }
+
       sleep 1 while true
     end
 
@@ -88,8 +92,6 @@ module Murga
     def ensure_peaceful_exit
       return unless @defined_at_exit.nil?
 
-      Signal.trap('INT') { stop }
-      Signal.trap('TERM') { stop }
       at_exit { stop }
 
       @defined_at_exit = true

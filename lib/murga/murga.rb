@@ -20,7 +20,13 @@ module Murga
     @root ||= Pathname.new(File.expand_path('../../../', __FILE__))
   end
 
+  def self.vendored_jar_paths
+    Dir.glob Murga.root.join('vendor', '**', '*.jar')
+  end
+
 end
+
+Murga.vendored_jar_paths.each { |path| require path }
 
 require 'murga/version'
 require 'murga/config'
