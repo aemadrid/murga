@@ -1,51 +1,38 @@
+require_relative '../handlers/request_proxy'
+require_relative '../handlers/response_proxy'
+
 module Murga
   module Handler
     class Base
 
       java_import 'ratpack.exec.Promise'
       java_import 'ratpack.exec.Blocking'
+      java_import 'ratpack.http.Response'
 
-      DEFAULT_STATUS    = 200
-      JSON_CONTENT_TYPE = 'application/json;charset=UTF-8'
+      DEFAULT_RESPONSE_STATUS = 200
+      JSON_CONTENT_TYPE       = 'application/json;charset=UTF-8'
 
       def self.handle(context)
-        new.handle(context)
+        new.handle context
       end
 
-      attr_reader :context
-
-      delegate :request, :response, :redirect, to: :context
-      delegate :get_body, :get_method, to: :request
-      delegate :is_get?, :is_head?, :is_patch?, :is_post?, :is_put?, to: :get_method
-      delegate :send_file, to: :response
-
-      def initialize(context = nil)
-        @context   = context
+      def initialize
         @finalized = false
       end
 
-      def handle(context = nil)
-        @context = context unless context.nil?
+      attr_reader :context, :request, :response_headers
+      attr_accessor :response_status
+
+      delegate :params, to: :request
+
+      def handle(context)
+        setup_request context
+
         if handles_request?
           result = process_request
-          process_result result
+          send(:after_request, result) if respond_to? :after_request
         else
           context.next
-        end
-      end
-
-      def process_result(result)
-        return if finalized?
-
-        case result
-        when String
-          render result
-          :string
-        when Hash
-          send_json result
-          :hash
-        else
-          :skipped
         end
       end
 
@@ -57,28 +44,18 @@ module Murga
         true
       end
 
-      def halt(status, body = '', headers = {})
-        response.status status
-        set_headers headers
-        render body
-      end
+      def render(options = {})
+        response = get_response options[:status] || response_status
 
-      def set_headers(headers = {})
-        headers.each { |k, v| response.headers[k.to_s] = v.to_s }
-      end
+        update_headers response, options
+        render_body response, options
 
-      def render(*args)
-        context.render *args
-        @finalized = true
-      end
-
-      def finalize(*args)
-        response.send *args
         @finalized = true
       end
 
       def redirect(*args)
         context.redirect *args
+
         @finalized = true
       end
 
@@ -86,41 +63,28 @@ module Murga
         !!@finalized
       end
 
-      def body
-        @body ||= get_body { |x| @body = x.to_s }
-      end
-
-      def send_json(hsh)
-        finalize JSON_CONTENT_TYPE, JrJackson::Json.dump(hsh)
-      end
-
-      def params
-        @params ||= build_params
-      end
-
       private
 
-      def build_params
-        ActiveSupport::HashWithIndifferentAccess.new.tap do |hsh|
-          hsh.update params_from_query
-          hsh.update params_from_tokens
-          hsh.update params_from_headers
-        end
+      def setup_request(context)
+        @context = context
+        @request = RequestProxy.new context.request
+        @response_status = DEFAULT_RESPONSE_STATUS
+        @response_headers = {}
       end
 
-      def params_from_query
-        request.query_params.to_h
+      def get_response(code)
+        ResponseProxy.new context.get_response.status(code.to_i)
       end
 
-      def params_from_tokens
-        context.path_tokens.to_h
+      def update_headers(response, options)
+        response_headers.merge options[:headers] || {}
+        response_headers['Content-Type'] = options[:content_type] if options[:content_type]
+        response.set_headers response_headers
       end
 
-      def params_from_headers
-        Hash.new.tap do |hsh|
-          forwarded       = request.headers.get('X-Forwarded-For')
-          hsh[:remote_ip] = forwarded if forwarded.present?
-        end
+      def render_body(response, options)
+        body = options[:body] || ''
+        response.send_body body
       end
 
     end

@@ -1,5 +1,5 @@
 module Testing
-  class BasicHandler < Murga::Handler::Base
+  class SimpleHandler < Murga::Handler::Basic
     def handles
       {
         ''         => :root,
@@ -23,24 +23,24 @@ module Testing
     end
 
     def on_not_found
-      halt 404
+      render status: 404
     end
 
     def on_sys_error
-      halt 500, 'Something went wrong'
+      render body: 'Something went wrong', status: 500
     end
 
     def on_params
       params
     end
   end
-  class ExtraHandler < Murga::Handler::Base
+  class ExtraHandler < Murga::Handler::Basic
     def handles_request?
       request.path == 'extra'
     end
 
     def process_request
-      render 'Hello from extra!'
+      'Hello from extra!'
     end
   end
 end

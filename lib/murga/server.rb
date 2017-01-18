@@ -5,12 +5,7 @@ module Murga
     java_import 'ratpack.handling.RequestLogger'
 
     def self.run(options = {})
-      server = new(options).start
-
-      Signal.trap('INT') { server.stop; exit }
-      Signal.trap('TERM') { server.stop; exit }
-
-      sleep 1 while true
+      new(options).run
     end
 
     attr_reader :config
@@ -31,6 +26,15 @@ module Murga
       end
     end
 
+    def add_handler(klass)
+      config.handlers.add klass
+    end
+
+    def add_rack_handler(app, handler = Murga::Handler::Rack)
+      options = { app: app }
+      config.handlers.add [handler, options]
+    end
+
     def start
       return false if running?
 
@@ -38,7 +42,14 @@ module Murga
       do_start
     end
 
-    alias :run :start
+    def run
+      start
+
+      Signal.trap('INT') { stop; exit }
+      Signal.trap('TERM') { stop; exit }
+
+      sleep 1 while true
+    end
 
     def stop
       return false unless running?
@@ -73,7 +84,15 @@ module Murga
     end
 
     def add_custom_handlers(chain)
-      config.handlers.each { |klass| chain.all klass }
+      config.handlers.each do |klass_or_ary|
+        if klass_or_ary.is_a? Array
+          klass, options = klass_or_ary
+          klass.config options if klass.respond_to?(:config)
+          chain.all klass
+        else
+          chain.all klass_or_ary
+        end
+      end
     end
 
     def add_public_index(chain)

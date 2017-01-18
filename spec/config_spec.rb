@@ -33,7 +33,7 @@ module Murga
       it('custom ') { expect(custom.env).to eq custom_options[:env] }
     end
     context 'handlers' do
-      let(:handler) { Murga::Handler::Base }
+      let(:handler) { Murga::Handler::Basic }
       let(:custom_options) { { handlers: [handler] } }
       it('default') { expect(custom.handlers).to eq Set.new([handler]) }
       it('custom ') { expect(subject.handlers).to eq Set.new }

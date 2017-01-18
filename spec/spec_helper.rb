@@ -4,7 +4,6 @@ ENV['RACK_ENV'] ||= 'test'
 
 require 'rubygems'
 require 'bundler/setup'
-require 'jbundler'
 
 Bundler.setup(:default, ENV['RACK_ENV'])
 

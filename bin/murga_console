@@ -5,7 +5,6 @@ require 'bundler/setup'
 
 ENV['RACK_ENV'] ||= 'development'
 
-require 'jbundler'
 Bundler.setup(:default, ENV['RACK_ENV'])
 
 require 'murga'

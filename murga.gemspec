@@ -25,8 +25,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport', '4.2.7'
   spec.add_dependency 'jruby-openssl', '~> 0.9'
   spec.add_dependency 'bundler', '~> 1.13'
-  spec.add_dependency 'jbundler', '~> 0.9'
+  # spec.add_dependency 'jbundler', '~> 0.9'
   spec.add_dependency 'jrjackson', '~> 0.4'
+  spec.add_dependency 'rack', '~> 2.0.1'
 
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec', '~> 3.5'

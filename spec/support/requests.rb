@@ -90,8 +90,7 @@ module RequestsHelper
     File.read path.join(*paths)
   end
 
-  def with_running_server(options = {})
-    server = described_class.new options
+  def while_running_server
     server.start
     yield
     server.stop
