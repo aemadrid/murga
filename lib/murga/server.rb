@@ -3,9 +3,14 @@ module Murga
 
     java_import 'ratpack.server.RatpackServer'
     java_import 'ratpack.handling.RequestLogger'
+    java_import 'org.slf4j.LoggerFactory'
 
     def self.run(options = {})
       new(options).run
+    end
+
+    def self.logger
+      LoggerFactory.get_logger RequestLogger.ncsa.java_class
     end
 
     attr_reader :config

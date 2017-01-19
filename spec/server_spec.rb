@@ -29,7 +29,7 @@ module Murga
       end
     end
     context 'dynamic' do
-      let(:handlers) { [Testing::SimpleHandler, Testing::ExtraHandler] }
+      let(:handlers) { [Testing::SimpleHandler, Testing::ExtraHandler, Testing::PostHandler] }
       context '+ public' do
         let(:path) { EXAMPLE1_ROOT }
         context 'requests' do
@@ -38,7 +38,11 @@ module Murga
               # Dynamic
               expect_response '/halt_404', 404, ''
               expect_response '/halt_500', 500, 'Something went wrong'
+              expect_response '/error', 500, 'Exception: RuntimeError : missing'
+              expect_response '/error?msg=hello', 500, 'Exception: RuntimeError : hello'
               expect_response '/extra', 200, 'Hello from extra!'
+              expect_response '/posting', 404, '', {}
+              expect_response '/posting', 200, 'Hello from posting!', {}, method: :post
               # JSON
               expect_json_response '/params'
               expect_json_response '/params?a=1', 'a' => '1'

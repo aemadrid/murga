@@ -12,8 +12,18 @@ module Murga
       DEFAULT_RESPONSE_STATUS = 200
       JSON_CONTENT_TYPE       = 'application/json;charset=UTF-8'
 
-      def self.handle(context)
-        new.handle context
+      class << self
+
+        def handle(context)
+          new.handle context
+        end
+
+        attr_writer :logger
+
+        def logger
+          @logger || Server.logger
+        end
+
       end
 
       def initialize
@@ -29,8 +39,7 @@ module Murga
         setup_request context
 
         if handles_request?
-          result = process_request
-          send(:after_request, result) if respond_to? :after_request
+          run_request
         else
           context.next
         end
@@ -66,10 +75,23 @@ module Murga
       private
 
       def setup_request(context)
-        @context = context
-        @request = RequestProxy.new context.request
-        @response_status = DEFAULT_RESPONSE_STATUS
+        @context          = context
+        @request          = RequestProxy.new context.request
+        @response_status  = DEFAULT_RESPONSE_STATUS
         @response_headers = {}
+      end
+
+      def run_request
+        result = process_request
+        send(:after_request, result) if respond_to? :after_request
+      rescue ::Exception => e
+        run_exception(e)
+      end
+
+      def run_exception(e)
+        msg = "Exception: #{e.class.name} : #{e.message}"
+        logger.error msg + "\n  " + e.backtrace[0,10].join("\n  ")
+        render status: 500, body: msg
       end
 
       def get_response(code)
@@ -85,6 +107,10 @@ module Murga
       def render_body(response, options)
         body = options[:body] || ''
         response.send_body body
+      end
+
+      def logger
+        self.class.logger
       end
 
     end

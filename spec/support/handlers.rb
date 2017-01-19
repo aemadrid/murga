@@ -6,6 +6,7 @@ module Testing
         'halt_404' => :not_found,
         'halt_500' => :sys_error,
         'params'   => :params,
+        'error'   => :error,
       }
     end
 
@@ -33,6 +34,10 @@ module Testing
     def on_params
       params
     end
+
+    def on_error
+      raise params[:msg] || 'missing'
+    end
   end
   class ExtraHandler < Murga::Handler::Basic
     def handles_request?
@@ -41,6 +46,15 @@ module Testing
 
     def process_request
       'Hello from extra!'
+    end
+  end
+  class PostHandler < Murga::Handler::Basic
+    def handles_request?
+      request.path == 'posting' && request.is_post?
+    end
+
+    def process_request
+      'Hello from posting!'
     end
   end
 end

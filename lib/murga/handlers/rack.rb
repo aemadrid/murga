@@ -20,7 +20,7 @@ module Murga
       def process_rack_app
         self.class.app.call(env)
       rescue ::Exception => e
-        puts "Exception: #{e.class.name} : #{e.message} : \n  #{e.backtrace[0, 10].join("\n  ")}"
+        logger.error "Exception: #{e.class.name} : #{e.message} : \n  #{e.backtrace[0, 10].join("\n  ")}"
         return [500, {}, []]
       end
 
